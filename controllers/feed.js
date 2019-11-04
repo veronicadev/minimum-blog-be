@@ -3,10 +3,12 @@ const Post = require('../models/post');
 const utils = require('./../utils/utils');
 exports.getPosts = (req, res, next) => {
     console.log('Get posts');
-    res.status(200).json({
-        posts: [{
-            'title': "Hello"
-        }]
+    Post.find({}, 'title content imageUrl createdAt')
+    .then(posts=>{        
+        res.status(200).json(posts)
+    })
+    .catch(err=>{
+        console.log(err)
     })
 }
 
