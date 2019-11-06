@@ -23,10 +23,16 @@ exports.postPost = (req, res, next) => {
         error.statusCode = 422;
         throw error;
     }
+    if(!req.file){
+        const error = new Error('Image url in not valid');
+        error.statusCode = 422;
+        throw error;
+    }
+    const imageUrl = req.file.path;
     const newPost = new Post({
         title: req.body.title,
         content: req.body.content,
-        imageUrl: req.body.imageUrl
+        imageUrl: imageUrl
     });
     newPost.save()
     .then((resPost)=>{
