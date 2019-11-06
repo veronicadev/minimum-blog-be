@@ -4,7 +4,8 @@ const router = express.Router();
 const feedController = require('../controllers/feed');
 
 router.get('/posts', feedController.getPosts);
-router.post('/post',[
+router.get('/posts/:postId', feedController.getPost);
+router.post('/posts',[
     body('title')
         .isString()
         .trim()
