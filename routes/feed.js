@@ -22,4 +22,22 @@ router.post('/posts',[
         .isURL()
         .withMessage('Invalid image url')
 ], feedController.postPost);
+router.put('/posts/:postId',[
+    body('title')
+        .isString()
+        .trim()
+        .escape()
+        .isLength({ min: 5 })
+        .withMessage('Invalid post title'),
+    body('content')
+        .isString()
+        .trim()
+        .escape()
+        .isLength({ min: 5 })
+        .withMessage('Invalid post content'),
+    body('imageUrl')
+        .isURL()
+        .withMessage('Invalid image url')
+], feedController.putPost);
+router.delete('/posts/:postId', feedController.deletePost)
 module.exports = router;

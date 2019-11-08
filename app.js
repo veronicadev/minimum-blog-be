@@ -61,8 +61,5 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
         });
     })
     .catch(error => {
-        if(!err.statusCode){
-            err.httpStatus = 500;
-        }
         next(err);
     })
