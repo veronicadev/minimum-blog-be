@@ -1,3 +1,4 @@
+const fs = require('fs');
 const getValidationMessage = (messages) => {
     let errorMessage = [];
     if (messages && messages.errors.length > 0) {

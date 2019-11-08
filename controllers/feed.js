@@ -1,12 +1,24 @@
 const { validationResult } = require('express-validator/check');
 const Post = require('../models/post');
 const utils = require('./../utils/utils');
+const ITEMS_PER_PAGE = 2;
 
 exports.getPosts = (req, res, next) => {
-    console.log('Get posts');
-    Post.find({}, 'title content imageUrl createdAt')
+    const currentPage = req.params.page || 1;
+    let totalItems;
+    Post.find().countDocuments()
+        .then(count => {
+            totalItems = count;
+            return Post.find({}, 'title content imageUrl createdAt')
+                .skip((currentPage-1)*ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE);
+        })
         .then(posts => {
-            res.status(200).json(posts)
+            res.status(200).json({
+                posts:posts,
+                totalItems: totalItems,
+                totalPages: Math.ceil((totalItems / ITEMS_PER_PAGE))
+            })
         })
         .catch(err => {
             next(err);
@@ -122,15 +134,15 @@ exports.deletePost = (req, res, next) => {
         utils.deleteFile(post.imageUrl);
         return Post.findByIdAndRemove(postId);
     })
-    .then(resPost => {
-        res.status(200).json({
-            message: "Post deleted successfully!",
-            post: resPost
+        .then(resPost => {
+            res.status(200).json({
+                message: "Post deleted successfully!",
+                post: resPost
+            });
+        })
+        .catch(error => {
+            const newError = new Error(error);
+            newError.httpStatusCode = 500;
+            return next(newError);
         });
-    })
-    .catch(error => {
-        const newError = new Error(error);
-        newError.httpStatusCode = 500;
-        return next(newError);
-    });
 }
