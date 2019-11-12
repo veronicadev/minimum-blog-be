@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator/check');
 const Post = require('../models/post');
 const utils = require('./../utils/utils');
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 6;
 
 exports.getPosts = (req, res, next) => {
     const currentPage = req.params.page || 1;
