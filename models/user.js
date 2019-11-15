@@ -1,3 +1,4 @@
+const userStatus = require('./../utils/utils').userStatus;
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const userSchema = new Schema({
@@ -15,7 +16,7 @@ const userSchema = new Schema({
         },
         status: {
             type: String,
-            required: true
+            default: userStatus.NEW
         },
         posts:[
             {

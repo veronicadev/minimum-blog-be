@@ -1,11 +1,12 @@
 const PORT = process.env.PORT || '8081';
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI ;
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const app = express();
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
 const multer = require('multer');
 
 app.use(bodyParser.json());
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
     next();
 });
 app.use(feedRoutes);
+app.use(authRoutes);
 
 app.use((err, req, res, next)=>{
     console.log(err);

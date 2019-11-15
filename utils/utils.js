@@ -14,7 +14,10 @@ const deleteFile = (filePath) =>{
         if(err) throw(err);
     })
 }
-
+const userStatus = {
+    NEW: 'new'
+}
 
 exports.getValidationMessage = getValidationMessage;
 exports.deleteFile = deleteFile;
+exports.userStatus = userStatus;
