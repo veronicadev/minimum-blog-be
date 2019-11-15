@@ -60,7 +60,7 @@ exports.getPost = (req, res, next) => {
     Post.findById(postId)
         .then(post => {
             if (!post) {
-                const error = new Error("Can't find a post");
+                const error = new Error("Can't get the post since the post does not exist");
                 error.statusCode = 400;
                 throw error;
             }
@@ -95,7 +95,7 @@ exports.putPost = (req, res, next) => {
     Post.findById(postId)
         .then(post => {
             if (!post) {
-                const error = new Error("Can't find a post");
+                const error = new Error("Can't edit the post since the post does not exist");
                 error.statusCode = 400;
                 throw error;
             }
@@ -127,7 +127,7 @@ exports.deletePost = (req, res, next) => {
     }
     Post.findById(postId).then(post => {
         if (!post) {
-            const error = new Error("Can't find a post");
+            const error = new Error("Can't delete the post since the post does not exist");
             error.statusCode = 400;
             throw error;
         }
