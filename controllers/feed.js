@@ -137,13 +137,14 @@ exports.deletePost = (req, res, next) => {
         error.statusCode = 400;
         throw error;
     }
+    console.log(postId)
     Post.findById(postId).then(post => {
         if (!post) {
             const error = new Error("Can't delete the post since the post does not exist");
             error.statusCode = 400;
             throw error;
         }
-        if(post.creator.toString()!==req.useId){
+        if(post.creator.toString()!==req.userId){
             const error = new Error("Not authorized");
             error.statusCode = 403;
             throw error;
@@ -152,6 +153,10 @@ exports.deletePost = (req, res, next) => {
         return Post.findByIdAndRemove(postId);
     })
         .then(resPost => {
+            io.getIO().emit('posts', {
+                action:'delete',
+                post: resPost
+            })
             res.status(200).json({
                 message: "Post deleted successfully!",
                 post: resPost
