@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator/check');
 const Post = require('../models/post');
 const utils = require('./../utils/utils');
+const io = require('./../utils/socket');
 const ITEMS_PER_PAGE = 6;
 
 exports.getPosts = async (req, res, next) => {
@@ -42,10 +43,15 @@ exports.postPost = (req, res, next) => {
     });
     newPost.save()
         .then((resPost) => {
+            io.getIO().emit('posts', {
+                action:'create',
+                post: post
+            });
             res.status(201).json({
                 message: "Post added successfully!",
                 post: resPost
             });
+
         })
         .catch((err) => {
             next(err);
@@ -110,6 +116,10 @@ exports.putPost = (req, res, next) => {
             return post.save();
         })
         .then((resPost) => {
+            io.getIO().emit('posts', {
+                action:'update',
+                post: resPost
+            })
             res.status(200).json({
                 message: "Post updated successfully!",
                 post: resPost

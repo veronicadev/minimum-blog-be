@@ -17,13 +17,7 @@ const userSchema = new Schema({
         status: {
             type: String,
             default: userStatus.NEW
-        },
-        posts:[
-            {
-                type: Schema.Types.ObjectId,
-                ref:'Post'
-            }
-        ]
+        }
     },
     { 
         timestamps: true

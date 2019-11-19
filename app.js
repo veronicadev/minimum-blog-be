@@ -1,5 +1,5 @@
 const PORT = process.env.PORT || '8081';
-const MONGODB_URI = process.env.MONGODB_URI ;
+const MONGODB_URI = process.env.MONGODB_URI;
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -54,14 +54,19 @@ app.use((err, req, res, next)=>{
         message: message
     })
 })
+
 /*CONNECTION DB & SERVER START*/
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(result => {
-        console.log('Mongoose started');
-        app.listen(PORT, () => {
-            console.log("SERVER STARTERD");
-        });
+.then(result => {
+    console.log('Mongoose started');
+    const server = app.listen(PORT, () => {
+        console.log("SERVER STARTERD");
+    });
+    const io = require('./utils/socket').init(server);
+    io.on('connection', socket =>{
+        console.log('Client connected');
     })
-    .catch(error => {
-        next(err);
-    })
+})
+.catch(error => {
+    next(err);
+})
