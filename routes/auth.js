@@ -28,4 +28,5 @@ router.post('/signup',[
         .isEmpty()
         .withMessage('Invalid Name')
 ], authController.postSignup);
+router.post('/login', authController.postLogin);
 module.exports = router;
