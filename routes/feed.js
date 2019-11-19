@@ -2,10 +2,11 @@ const express = require('express');
 const { body, check } = require('express-validator/check');
 const router = express.Router();
 const feedController = require('../controllers/feed');
+const isAuth = require('./../middlewares/is-auth');
 
 router.get('/posts', feedController.getPosts);
 router.get('/posts/:postId', feedController.getPost);
-router.post('/posts',[
+router.post('/posts', isAuth, [
     body('title')
         .isString()
         .trim()
@@ -22,7 +23,7 @@ router.post('/posts',[
         .isURL()
         .withMessage('Invalid image url')
 ], feedController.postPost);
-router.put('/posts/:postId',[
+router.put('/posts/:postId',isAuth, [
     body('title')
         .isString()
         .trim()
@@ -39,5 +40,5 @@ router.put('/posts/:postId',[
         .isURL()
         .withMessage('Invalid image url')
 ], feedController.putPost);
-router.delete('/posts/:postId', feedController.deletePost)
+router.delete('/posts/:postId',isAuth, feedController.deletePost)
 module.exports = router;
