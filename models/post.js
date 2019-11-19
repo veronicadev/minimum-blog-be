@@ -11,12 +11,12 @@ const postSchema = new Schema({
         },
         imageUrl: {
             type: String
-        }
-        /*user:{
+        },
+        creator:{
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true
-        }*/
+        }
     },
     { 
         timestamps: true

@@ -18,10 +18,7 @@ router.post('/posts', isAuth, [
         .trim()
         .escape()
         .isLength({ min: 5 })
-        .withMessage('Invalid post content'),
-    body('imageUrl')
-        .isURL()
-        .withMessage('Invalid image url')
+        .withMessage('Invalid post content')
 ], feedController.postPost);
 router.put('/posts/:postId',isAuth, [
     body('title')
@@ -35,10 +32,7 @@ router.put('/posts/:postId',isAuth, [
         .trim()
         .escape()
         .isLength({ min: 5 })
-        .withMessage('Invalid post content'),
-    body('imageUrl')
-        .isURL()
-        .withMessage('Invalid image url')
+        .withMessage('Invalid post content')
 ], feedController.putPost);
 router.delete('/posts/:postId',isAuth, feedController.deletePost)
 module.exports = router;

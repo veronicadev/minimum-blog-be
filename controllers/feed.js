@@ -38,10 +38,12 @@ exports.postPost = (req, res, next) => {
         throw error;
     }
     const imageUrl = req.file.path;
+    const userId = req.userId;
     const newPost = new Post({
         title: req.body.title,
         content: req.body.content,
-        imageUrl: imageUrl
+        imageUrl: imageUrl,
+        creator: userId
     });
     newPost.save()
         .then((resPost) => {
@@ -99,6 +101,11 @@ exports.putPost = (req, res, next) => {
                 error.statusCode = 400;
                 throw error;
             }
+            if(post.creator.toString()!==req.userId){
+                const error = new Error("Not authorized");
+                error.statusCode = 403;
+                throw error;
+            }
             if (imageUrl !== post.imageUrl) {
                 utils.deleteFile(post.imageUrl);
             }
@@ -129,6 +136,11 @@ exports.deletePost = (req, res, next) => {
         if (!post) {
             const error = new Error("Can't delete the post since the post does not exist");
             error.statusCode = 400;
+            throw error;
+        }
+        if(post.creator.toString()!==req.useId){
+            const error = new Error("Not authorized");
+            error.statusCode = 403;
             throw error;
         }
         utils.deleteFile(post.imageUrl);
