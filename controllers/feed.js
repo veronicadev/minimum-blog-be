@@ -3,26 +3,21 @@ const Post = require('../models/post');
 const utils = require('./../utils/utils');
 const ITEMS_PER_PAGE = 6;
 
-exports.getPosts = (req, res, next) => {
+exports.getPosts = async (req, res, next) => {
     const currentPage = req.params.page || 1;
-    let totalItems;
-    Post.find().countDocuments()
-        .then(count => {
-            totalItems = count;
-            return Post.find({}, 'title content imageUrl createdAt')
-                .skip((currentPage-1)*ITEMS_PER_PAGE)
-                .limit(ITEMS_PER_PAGE);
-        })
-        .then(posts => {
-            res.status(200).json({
-                posts:posts,
-                totalItems: totalItems,
-                totalPages: Math.ceil((totalItems / ITEMS_PER_PAGE))
-            })
-        })
-        .catch(err => {
-            next(err);
-        })
+    try{
+        const totalItems = await Post.find().countDocuments()
+        const posts = await Post.find({}, 'title content imageUrl createdAt')
+                    .skip((currentPage-1)*ITEMS_PER_PAGE)
+                    .limit(ITEMS_PER_PAGE);
+        res.status(200).json({
+            posts:posts,
+            totalItems: totalItems,
+            totalPages: Math.ceil((totalItems / ITEMS_PER_PAGE))
+        });
+    }catch(err){
+        next(err);
+    }
 }
 
 exports.postPost = (req, res, next) => {
