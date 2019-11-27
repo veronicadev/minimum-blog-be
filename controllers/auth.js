@@ -60,10 +60,14 @@ exports.postLogin = (req, res, next) =>{
             }, JWT_SECRET, {
                 expiresIn: '2h'
             });
-            res.status(200).json({
-                token: token,
-                userId: loadedUser._id.toString()
-            })
+            const userResponse = {
+                id: loadedUser._id,
+                email: loadedUser.email,
+                name: loadedUser.name,
+                status: loadedUser.status,
+                token: token
+            }
+            res.status(200).json(userResponse)
         })
         .catch(err=>{
             next(err);
