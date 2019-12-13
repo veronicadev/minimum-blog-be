@@ -1,22 +1,24 @@
 const { validationResult } = require('express-validator/check');
 const Post = require('../models/post');
+const User = require('../models/user');
 const utils = require('./../utils/utils');
 const io = require('./../utils/socket');
+const mongoose = require('mongoose')
 const ITEMS_PER_PAGE = 6;
 
 exports.getPosts = async (req, res, next) => {
     const currentPage = req.params.page || 1;
-    try{
+    try {
         const totalItems = await Post.find().countDocuments()
         const posts = await Post.find({}, 'title content imageUrl createdAt')
-                    .skip((currentPage-1)*ITEMS_PER_PAGE)
-                    .limit(ITEMS_PER_PAGE);
+            .skip((currentPage - 1) * ITEMS_PER_PAGE)
+            .limit(ITEMS_PER_PAGE);
         res.status(200).json({
-            posts:posts,
+            posts: posts,
             totalItems: totalItems,
             totalPages: Math.ceil((totalItems / ITEMS_PER_PAGE))
         });
-    }catch(err){
+    } catch (err) {
         next(err);
     }
 }
@@ -44,7 +46,7 @@ exports.postPost = (req, res, next) => {
     newPost.save()
         .then((resPost) => {
             io.getIO().emit('posts', {
-                action:'create',
+                action: 'create',
                 post: post
             });
             res.status(201).json({
@@ -102,7 +104,7 @@ exports.putPost = (req, res, next) => {
                 error.statusCode = 400;
                 throw error;
             }
-            if(post.creator.toString()!==req.userId){
+            if (post.creator.toString() !== req.userId) {
                 const error = new Error("Not authorized");
                 error.statusCode = 403;
                 throw error;
@@ -117,7 +119,7 @@ exports.putPost = (req, res, next) => {
         })
         .then((resPost) => {
             io.getIO().emit('posts', {
-                action:'update',
+                action: 'update',
                 post: resPost
             })
             res.status(200).json({
@@ -144,7 +146,7 @@ exports.deletePost = (req, res, next) => {
             error.statusCode = 400;
             throw error;
         }
-        if(post.creator.toString()!==req.userId){
+        if (post.creator.toString() !== req.userId) {
             const error = new Error("Not authorized");
             error.statusCode = 403;
             throw error;
@@ -154,7 +156,7 @@ exports.deletePost = (req, res, next) => {
     })
         .then(resPost => {
             io.getIO().emit('posts', {
-                action:'delete',
+                action: 'delete',
                 post: resPost
             })
             res.status(200).json({
@@ -167,4 +169,23 @@ exports.deletePost = (req, res, next) => {
             newError.httpStatusCode = 500;
             return next(newError);
         });
+}
+
+exports.getFeed = (req, res, next) => {
+    console.log(req.user.id)
+    User.findById(req.user.id).then(user => {
+        const following = user.following.map((element =>{
+            return mongoose.Types.ObjectId(element);
+        }));
+        console.log(following )
+        return Post.find({ 'creator': { $in: following } })
+    })
+    .then(posts => {
+        res.json(posts);
+    })
+    .catch(error => {
+        const newError = new Error(error);
+        newError.httpStatusCode = 500;
+        return next(newError);
+    });
 }

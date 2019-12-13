@@ -5,6 +5,7 @@ const feedController = require('../controllers/feed');
 const isAuth = require('./../middlewares/is-auth');
 
 router.get('/posts', feedController.getPosts);
+router.get('/posts/feed',isAuth, feedController.getFeed);
 router.get('/posts/:postId', feedController.getPost);
 router.post('/posts', isAuth, [
     body('title')
@@ -34,5 +35,5 @@ router.put('/posts/:postId',isAuth, [
         .isLength({ min: 5 })
         .withMessage('Invalid post content')
 ], feedController.putPost);
-router.delete('/posts/:postId',isAuth, feedController.deletePost)
+router.delete('/posts/:postId',isAuth, feedController.deletePost);
 module.exports = router;
