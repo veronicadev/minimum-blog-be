@@ -5,7 +5,7 @@ const feedController = require('../controllers/feed');
 const isAuth = require('./../middlewares/is-auth');
 
 router.get('/posts', feedController.getPosts);
-router.get('/posts/feed',isAuth, feedController.getFeed);
+/*router.get('/posts/feed',isAuth, feedController.getFeed);*/
 router.get('/posts/:postId', feedController.getPost);
 router.post('/posts', isAuth, [
     body('title')

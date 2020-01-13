@@ -170,7 +170,7 @@ exports.deletePost = (req, res, next) => {
             return next(newError);
         });
 }
-
+/*
 exports.getFeed = (req, res, next) => {
     console.log(req.user.id)
     User.findById(req.user.id).then(user => {
@@ -188,4 +188,4 @@ exports.getFeed = (req, res, next) => {
         newError.httpStatusCode = 500;
         return next(newError);
     });
-}
+}*/
