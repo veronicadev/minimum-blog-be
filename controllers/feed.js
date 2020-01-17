@@ -170,22 +170,30 @@ exports.deletePost = (req, res, next) => {
             return next(newError);
         });
 }
-/*
+
 exports.getFeed = (req, res, next) => {
-    console.log(req.user.id)
+    const currentPage = req.params.page || 1;
+    const totalItems = 0;
     User.findById(req.user.id).then(user => {
         const following = user.following.map((element =>{
             return mongoose.Types.ObjectId(element);
         }));
-        console.log(following )
-        return Post.find({ 'creator': { $in: following } })
+        return Post.find({ 'creator': { $in: following } }).countDocuments()
+    })
+    .then(total => {
+        totalItems = total;
+        return Post.find({}, 'title content imageUrl createdAt creator').populate('creator', 'name')            
+        .skip((currentPage - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
     })
     .then(posts => {
-        res.json(posts);
-    })
+        res.status(200).json({
+            posts: posts,
+            totalItems: totalItems,
+            totalPages: Math.ceil((totalItems / ITEMS_PER_PAGE))
+        });
+    }) 
     .catch(error => {
-        const newError = new Error(error);
-        newError.httpStatusCode = 500;
-        return next(newError);
+        return next(error);
     });
-}*/
+}
