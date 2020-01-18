@@ -6,7 +6,7 @@ const io = require('./../utils/socket');
 const mongoose = require('mongoose')
 const ITEMS_PER_PAGE = 6;
 
-exports.getPosts = async (req, res, next) => {
+exports.getPosts = async(req, res, next) => {
     const currentPage = req.params.page || 1;
     try {
         const totalItems = await Post.find().countDocuments()
@@ -141,19 +141,19 @@ exports.deletePost = (req, res, next) => {
     }
     console.log(postId)
     Post.findById(postId).then(post => {
-        if (!post) {
-            const error = new Error("Can't delete the post since the post does not exist");
-            error.statusCode = 400;
-            throw error;
-        }
-        if (post.creator.toString() !== req.userId) {
-            const error = new Error("Not authorized");
-            error.statusCode = 403;
-            throw error;
-        }
-        utils.deleteFile(post.imageUrl);
-        return Post.findByIdAndRemove(postId);
-    })
+            if (!post) {
+                const error = new Error("Can't delete the post since the post does not exist");
+                error.statusCode = 400;
+                throw error;
+            }
+            if (post.creator.toString() !== req.userId) {
+                const error = new Error("Not authorized");
+                error.statusCode = 403;
+                throw error;
+            }
+            utils.deleteFile(post.imageUrl);
+            return Post.findByIdAndRemove(postId);
+        })
         .then(resPost => {
             io.getIO().emit('posts', {
                 action: 'delete',
@@ -173,27 +173,29 @@ exports.deletePost = (req, res, next) => {
 
 exports.getFeed = (req, res, next) => {
     const currentPage = req.params.page || 1;
-    const totalItems = 0;
+    let totalItems = 0;
+    let following = [];
     User.findById(req.user.id).then(user => {
-        const following = user.following.map((element =>{
-            return mongoose.Types.ObjectId(element);
-        }));
-        return Post.find({ 'creator': { $in: following } }).countDocuments()
-    })
-    .then(total => {
-        totalItems = total;
-        return Post.find({}, 'title content imageUrl createdAt creator').populate('creator', 'name')            
-        .skip((currentPage - 1) * ITEMS_PER_PAGE)
-        .limit(ITEMS_PER_PAGE);
-    })
-    .then(posts => {
-        res.status(200).json({
-            posts: posts,
-            totalItems: totalItems,
-            totalPages: Math.ceil((totalItems / ITEMS_PER_PAGE))
+            console.log(user)
+            following = user.following.map((element => {
+                return mongoose.Types.ObjectId(element);
+            }));
+            return Post.find({ 'creator': { $in: following } }).countDocuments()
+        })
+        .then(total => {
+            totalItems = total;
+            return Post.find({ 'creator': { $in: following } }, 'title content imageUrl createdAt creator').populate('creator', 'name')
+                .skip((currentPage - 1) * ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE);
+        })
+        .then(posts => {
+            res.status(200).json({
+                posts: posts,
+                totalItems: totalItems,
+                totalPages: Math.ceil((totalItems / ITEMS_PER_PAGE))
+            });
+        })
+        .catch(error => {
+            return next(error);
         });
-    }) 
-    .catch(error => {
-        return next(error);
-    });
 }
