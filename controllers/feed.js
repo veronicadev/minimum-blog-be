@@ -30,29 +30,28 @@ exports.postPost = (req, res, next) => {
         error.statusCode = 422;
         throw error;
     }
-    if (!req.file) {
+    /*if (!req.file) {
         const error = new Error('Image url in not valid');
         error.statusCode = 422;
         throw error;
     }
-    const imageUrl = req.file.path;
-    const userId = req.userId;
+    const imageUrl = req.file.path;*/
+    const userId = req.user.id;
     const newPost = new Post({
         title: req.body.title,
         content: req.body.content,
-        imageUrl: imageUrl,
+        category: req.body.category,
         creator: userId
     });
     newPost.save()
         .then((resPost) => {
             io.getIO().emit('posts', {
                 action: 'create',
-                post: post
-            });
-            res.status(201).json({
-                message: "Post added successfully!",
                 post: resPost
             });
+            res.status(201).json(
+                resPost
+            );
 
         })
         .catch((err) => {
@@ -77,7 +76,6 @@ exports.getPost = (req, res, next) => {
 }
 exports.putPost = (req, res, next) => {
     const postId = req.params.postId;
-    let imageUrl = req.body.imageUrl;
     const valErrors = validationResult(req);
     if (!postId) {
         const error = new Error('Param PostId is missing');
@@ -89,14 +87,14 @@ exports.putPost = (req, res, next) => {
         error.statusCode = 422;
         throw error;
     }
-    if (req.file) {
+    /*if (req.file) {
         imageUrl = req.file.path;
     }
     if (!imageUrl) {
         const error = new Error('No image');
         error.statusCode = 422;
         throw error;
-    }
+    }*/
     Post.findById(postId)
         .then(post => {
             if (!post) {
@@ -104,17 +102,17 @@ exports.putPost = (req, res, next) => {
                 error.statusCode = 400;
                 throw error;
             }
-            if (post.creator.toString() !== req.userId) {
+            if (post.creator.toString() !== req.user.id) {
                 const error = new Error("Not authorized");
                 error.statusCode = 403;
                 throw error;
             }
-            if (imageUrl !== post.imageUrl) {
+           /* if (imageUrl !== post.imageUrl) {
                 utils.deleteFile(post.imageUrl);
-            }
+            }*/
             post.title = req.body.title;
+            post.category = req.body.category;
             post.content = req.body.content;
-            post.imageUrl = imageUrl;
             return post.save();
         })
         .then((resPost) => {
@@ -122,10 +120,9 @@ exports.putPost = (req, res, next) => {
                 action: 'update',
                 post: resPost
             })
-            res.status(200).json({
-                message: "Post updated successfully!",
-                post: resPost
-            });
+            res.status(200).json(
+                resPost
+            );
         })
         .catch(err => {
             next(err);
