@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const Post = require('../models/post');
 const User = require('../models/user');
 const utils = require('./../utils/utils');
@@ -7,9 +7,9 @@ const mongoose = require('mongoose')
 const ITEMS_PER_PAGE = 6;
 
 exports.getPosts = async(req, res, next) => {
-    const currentPage = req.params.page || 1;
+    const currentPage = req.query.page || 1;
     try {
-        const totalItems = await Post.find().countDocuments()
+        const totalItems = await Post.find().countDocuments();
         const posts = await Post.find({}, 'title content imageUrl createdAt creator').populate('creator', 'name')
             .skip((currentPage - 1) * ITEMS_PER_PAGE)
             .limit(ITEMS_PER_PAGE);
@@ -169,7 +169,7 @@ exports.deletePost = (req, res, next) => {
 }
 
 exports.getFeed = (req, res, next) => {
-    const currentPage = req.params.page || 1;
+    const currentPage = req.query.page || 1;
     let totalItems = 0;
     let following = [];
     User.findById(req.user.id).then(user => {

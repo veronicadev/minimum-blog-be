@@ -1,5 +1,5 @@
 const User = require('./../models/user');
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const utils = require('./../utils/utils');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -41,7 +41,7 @@ exports.postLogin = (req, res, next) =>{
     User.findOne({email:email})
         .then(user=>{
             if(!user){
-                const error = new Error('User with this email address could not be found!');
+                const error = new Error('Wrong email or password entered');
                 error.statusCode = 400;
                 throw error;
             }
@@ -50,7 +50,7 @@ exports.postLogin = (req, res, next) =>{
         })
         .then(isEqual=>{
             if(!isEqual){
-                const error = new Error('Wrong password entered');
+                const error = new Error('Wrong email or password entered');
                 error.statusCode = 400;
                 throw error;
             }
