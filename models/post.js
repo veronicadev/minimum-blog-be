@@ -9,8 +9,9 @@ const postSchema = new Schema({
             type: String,
             required: true
         },
-        imageUrl: {
-            type: String
+        excerpt: {
+            type: String,
+            required: true
         },
         creator:{
             type: Schema.Types.ObjectId,

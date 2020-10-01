@@ -11,29 +11,35 @@ router.post('/posts', isAuth, [
     body('title')
         .isString()
         .trim()
-        .escape()
         .isLength({ min: 5 })
         .withMessage('Invalid post title'),
     body('content')
         .isString()
         .trim()
-        .escape()
         .isLength({ min: 5 })
-        .withMessage('Invalid post content')
+        .withMessage('Invalid post content'),
+    body('excerpt')
+        .isString()
+        .trim()
+        .isLength({ min: 2 })
+        .withMessage('Invalid post excerpt')
 ], feedController.postPost);
 router.put('/posts/:postId',isAuth, [
     body('title')
         .isString()
         .trim()
-        .escape()
         .isLength({ min: 5 })
         .withMessage('Invalid post title'),
     body('content')
         .isString()
         .trim()
-        .escape()
         .isLength({ min: 5 })
-        .withMessage('Invalid post content')
+        .withMessage('Invalid post content'),
+    body('excerpt')
+        .isString()
+        .trim()
+        .isLength({ min: 2 })
+        .withMessage('Invalid post excerpt')
 ], feedController.putPost);
 router.delete('/posts/:postId',isAuth, feedController.deletePost);
 module.exports = router;

@@ -10,7 +10,7 @@ exports.getPosts = async(req, res, next) => {
     const currentPage = req.query.page || 1;
     try {
         const totalItems = await Post.find().countDocuments();
-        const posts = await Post.find({}, 'title content imageUrl createdAt creator').populate('creator', 'name')
+        const posts = await Post.find({}, 'title content imageUrl createdAt creator excerpt').populate('creator', 'name')
             .skip((currentPage - 1) * ITEMS_PER_PAGE)
             .limit(ITEMS_PER_PAGE);
         res.status(200).json({
@@ -39,8 +39,9 @@ exports.postPost = (req, res, next) => {
     const userId = req.user.id;
     const newPost = new Post({
         title: req.body.title,
-        content: req.body.content,
+        content: encodeURI(req.body.content),
         category: req.body.category,
+        excerpt: encodeURI(req.body.excerpt),
         creator: userId
     });
     newPost.save()
@@ -112,7 +113,8 @@ exports.putPost = (req, res, next) => {
             }*/
             post.title = req.body.title;
             post.category = req.body.category;
-            post.content = req.body.content;
+            post.excerpt = encodeURI(req.body.excerpt);
+            post.content = encodeURI(req.body.content);
             return post.save();
         })
         .then((resPost) => {
@@ -181,7 +183,7 @@ exports.getFeed = (req, res, next) => {
         })
         .then(total => {
             totalItems = total;
-            return Post.find({ 'creator': { $in: following } }, 'title content imageUrl createdAt creator').populate('creator', 'name')
+            return Post.find({ 'creator': { $in: following } }, 'title content imageUrl createdAt creator excerpt').populate('creator', 'name')
                 .skip((currentPage - 1) * ITEMS_PER_PAGE)
                 .limit(ITEMS_PER_PAGE);
         })

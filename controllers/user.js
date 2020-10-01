@@ -29,7 +29,7 @@ exports.getPosts = async (req, res, next) => {
         error.statusCode = 400;
         throw error;
     }
-    const currentPage = req.params.page || 1;
+    const currentPage = req.query.page || 1;
     try {
         const totalItems = await Post.find({creator: userId}).countDocuments()
         const posts = await Post.find({creator: userId})
